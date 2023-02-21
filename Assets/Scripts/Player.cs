@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -22,6 +20,21 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         rb.velocity = Vector2.zero;
+        float respawnX = Camera.main.ScreenToWorldPoint(Vector3.zero).x + 2f;
+        transform.position = new Vector3(respawnX, -2.2f, 0f);
+    }
+
+    private void Update()
+    {
+        // Get the screen boundaries
+        Vector3 minScreenBounds = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+        Vector3 maxScreenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+
+        // Clamp the position of the player within the screen boundaries
+        Vector3 clampedPosition = transform.position;
+        clampedPosition.x = Mathf.Clamp(clampedPosition.x, minScreenBounds.x, maxScreenBounds.x);
+        clampedPosition.y = Mathf.Clamp(clampedPosition.y, minScreenBounds.y, maxScreenBounds.y);
+        transform.position = clampedPosition;
     }
 
     private void FixedUpdate()
@@ -50,6 +63,14 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = false;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            GameManager.Instance.GameOver();
         }
     }
 }
