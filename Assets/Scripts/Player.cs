@@ -10,11 +10,15 @@ public class Player : MonoBehaviour
     float moveSpeed = 5f;
     
     public Animator animator;
+    private AudioSource audioSource;
+    public AudioClip jumpingSound;
+    public AudioClip bumpingSound;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -63,6 +67,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = false;
+            audioSource.PlayOneShot(jumpingSound);
         }
     }
 
@@ -70,6 +75,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Obstacle"))
         {
+            collision.gameObject.GetComponent<AudioSource>().Play();
             GameManager.Instance.GameOver();
         }
     }

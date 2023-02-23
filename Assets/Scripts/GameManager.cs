@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,7 +10,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public float initialGameSpeed = 5f;
     public float gameSpeedIncrement = 0.1f;
-
+    
     // UI
     public TextMeshProUGUI gameOverText;
     public Button retryButton;
@@ -45,10 +47,14 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        spawner = FindObjectOfType<Spawner>();
-        player = FindObjectOfType<Player>();
+        try
+        {
+            spawner = FindObjectOfType<Spawner>();
+            player = FindObjectOfType<Player>();
 
-        NewGame();
+            NewGame();
+        }
+        catch (Exception) { }
     }
 
     public void NewGame()
@@ -74,6 +80,7 @@ public class GameManager : MonoBehaviour
         highscoreText.gameObject.SetActive(false);
         highScoreLabel.gameObject.SetActive(false);
         scoreText.gameObject.SetActive(true);
+        Camera.main.gameObject.GetComponent<AudioSource>().Play();
 
         UpdateHighScore();
     }
@@ -94,15 +101,30 @@ public class GameManager : MonoBehaviour
         highscoreText.gameObject.SetActive(true);
         highScoreLabel.gameObject.SetActive(true);
         scoreText.gameObject.SetActive(false);
+        Camera.main.gameObject.GetComponent<AudioSource>().Stop();
 
         UpdateHighScore();
     }
 
+    public void Play()
+    {
+        SceneManager.LoadScene("Game");
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
     private void Update()
     {
-        gameSpeed += gameSpeedIncrement * Time.deltaTime;
-        score += gameSpeed * Time.deltaTime;
-        scoreText.text = Mathf.FloorToInt(score).ToString("D5");
+        try
+        {
+            gameSpeed += gameSpeedIncrement * Time.deltaTime;
+            score += gameSpeed * Time.deltaTime;
+            scoreText.text = Mathf.FloorToInt(score).ToString("D5");
+        }
+        catch (Exception) { }
     }
 
     private void UpdateHighScore()
